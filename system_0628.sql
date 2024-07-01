@@ -244,6 +244,8 @@ where deptno = (
                 select deptno
                 from emp
                 where ename = 'BLAKE'
+                -- 강사님 코드
+                -- where inicap(ename) = 'Blake' 
 )
 ;
 -- 2. 평균 급여 이상을 받는 모든 사원에 대해서 사원 번호와 이름을 디스플레이하는 질의문을 생성. 
@@ -254,17 +256,26 @@ where sal>= (
         select avg(sal)
         from emp
         )
-order by sal 
+order by sal desc
 ;
 -- 3. 보너스를 받는 사원의 부서 번호와 
 --    급여에 일치하는 사원의 이름, 부서 번호 그리고 급여를 디스플레이하라.
-select ename,deptno,sal
+select ename,deptno,sal,comm
 from emp
 where (deptno,sal) in (
                 select deptno,sal
                 from emp
                 where comm is not null 
                 ) 
+;
+
+
+SELECT e1.ename 사원, e1.deptno "부서 번호",e1.sal 급여
+FROM emp e1
+JOIN emp e2 ON e1.sal = e2.sal
+WHERE e1.comm IS NOT NULL
+AND e1.empno != e2.empno
+ORDER BY 급여 DESC
 ;
 -------------------------------------------------------------------------------
 --  데이터 조작어 (DML:Data Manpulation Language)  **      ----------------------
@@ -337,6 +348,7 @@ as select * from dept
 ; 
 -- 2. tbl 가공 생성 
 -- 원하는 조건으로 테이블 생성 / 부서번호 = 20인 사람
+-- 프라이머리키는 복제되지 않는다.
 CREATE TABLE emp20
 as select empno, sal*12 annsal
     from emp
@@ -434,7 +446,7 @@ where profno = 9903
 --  문2) 서브쿼리를 이용하여 학번이 10201인 학생의 학년과 학과 번호를
 --        10103 학번 학생의 학년과 학과 번호와 동일하게 수정하여라
 update student 
-set (grade,deptno) = (
+set (grade,deptno) = ( -- 페어와일즈
         select grade,deptno -- 3학년 101
         from student
         where studno = 10103 
@@ -453,7 +465,7 @@ where studno = 20103
 
 -- 문2) 학생 테이블에서 컴퓨터공학과에 소속된 학생을 모두 삭제하여라 hw --> rollback 
 -- commit xx
---delete 
+delete 
 from student 
 where deptno = (
                     select deptno

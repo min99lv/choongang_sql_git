@@ -383,7 +383,8 @@ where e1.empno = e2.mgr
 select e.ename 이름, e.sal, e.deptno, d.dname, d.loc, e2.ename 관리자명
         , (SELECT COUNT (*) FROM emp) 전체직원수
 from emp e, dept d, emp e2
-where e.deptno = d.deptno and e.empno = e2.empno
+where e.deptno = d.deptno 
+and e.mgr = e2.empno(+)
 ;
 -- 3. 이름,급여,등급,부서명,관리자명, 급여가 2000이상인 사람
 --    (emp, dept,salgrade TBL)
@@ -392,11 +393,23 @@ from emp e, dept d, salgrade s ,emp e2
 where e.deptno = d.deptno and e.sal > 2000
     and e.empno = e2.empno 
 ;
+
+-- 강사님 코드
+select e.ename, e.sal,s.grade,d.dname, e2.ename 관리자명 
+from emp e, dept d, salgrade s ,emp e2
+where e.mgr = e2.empno 
+and e.deptno = d.deptno 
+and e.sal between s.losal and s.hisal
+and e.sal >= 2000
+;
 -- 4. 보너스를 받는 사원에 대하여 이름,부서명,위치를 출력하는 SELECT 문장을 작성emp ,dept TBL)
 select e.ename, d.dname, d.loc
 from emp e, dept d
-where e.deptno = d.deptno and e.comm is not null
+where e.deptno = d.deptno 
+and e.comm is not null
+-- and e.comm > 0;
 ;
+
 -- 5. 사번, 사원명, 부서코드, 부서명을 검색하라. 사원명기준으로 오름차순정열(emp ,dept TBL)
 select e.empno, e.ename, e.deptno, d.dname
 from emp e, dept d
