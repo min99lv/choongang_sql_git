@@ -90,7 +90,7 @@ INSERT INTO student(studno, idnum)
 SELECT constraint_name, constraint_type
 FROM user_constraints
 WHERE table_name in('SUBJECT','STUDENT')
-;
+;--- r 외래키
 
 -- fk(외래키)***
 
@@ -100,17 +100,17 @@ where empno = 1000;
 delete dept
 where deptno = 50;
 
--- 1. Restrict : 자식 존재 삭제 안됨  (연관 관계 때문)
+-- 조건1. Restrict : 자식 존재 삭제 안됨  (연관 관계 때문)
 --    1) 선언   Emp Table에서  REFERENCES DEPT (DEPTNO) 
 --    2) 예시   integrity constraint (SCOTT.FK_DEPTNO) violated - child record found
 delete dept
 where deptno = 50;
--- 2. Cascading Delete : 같이 죽자
+-- 조건2. Cascading Delete : 같이 죽자
 --    1)종속삭제 선언 : Emp Table에서 REFERENCES DEPT (DEPTNO) ON DELETE CASCADE
 -- 부모, 자식 둘 다 삭제
 delete dept
 where deptno = 50;
--- 3.  SET NULL   
+-- 조건3.  SET NULL   
 --    1) 종속 NULL 선언 : Emp Table에서 REFERENCES DEPT (DEPTNO)  ON DELETE SET NULL
 -- 부모는 없어지고 자식은 null이된다
 delete dept
@@ -124,6 +124,7 @@ rollback;
 --  [1]인덱스의 종류
 --   1)고유 인덱스 : 유일한 값을 가지는 칼럼에 대해 생성하는 인덱스로 모든 인덱스 키는
 --           테이블의 하나의 행과 연결
+-- 인덱스와 프라이머리키의 차이 NULL값이 되느냐 안되느냐
 CREATE UNIQUE INDEX idx_dept_name
 ON department(dname);
 
@@ -223,7 +224,7 @@ ALTER SESSION SET OPTIMIZER_MODE=RULE;
 -- 인덱스를 타는 경우
 select * from emp where job = 'MANAGER'; -- = index OK
 -- 인덱스를 타지 않는 경우
---부정형으로 가져왓을때 인덱스를 타지 않는다
+--부정형으로 가져왓을때 인덱스를 타지 않는
 select * from emp where job <> 'MANAGER'; -- <> index NO
 select * from emp where job like '%NA%'; -- like '%NA%' index NO
 select * from emp where job like 'MA%'; -- like 'MA%' index OK
@@ -352,6 +353,10 @@ values (1,'HGDONG','SEOUL','123-4567','gbhong@gmail.com');
 -- 문1) address스키마/Data 유지하며     addr_second Table 생성
 CREATE table addr_second
 as select * from address;
+
+-- 강사님 코드                     -- 안적어도 된다
+CREATE table addr_second(id, name, addr, phone, email)
+as select * from address;
 -- 문2) address스키마 유지하며  Data 복제 하지 않고   addr_seven Table 생성
 CREATE table addr_seven
 as select *
@@ -364,6 +369,8 @@ as select id, name
 from address;
 -- 문4) addr_second 테이블 을 addr_tmp로 이름을 변경 하시요
 alter table addr_second rename to addr_tmp;
+-- 강사님 코드
+RENAME addr_second to addr_tmp;
 
 ------------------------------------------------------------------
 -----     데이터 사전
@@ -407,3 +414,4 @@ from all_tables;
 -- 3. DBA_   : 데이터베이스 관리자만 접근 가능한 데이터 사전 뷰
 select owner, table_name
 from dba_tables;
+-- 처음에 스캇을 만들었을때 dba권한을 줬기때문에 볼 수 있다 
